@@ -55,28 +55,36 @@ def integer_Q2():
 
 def integer_Q2_state_0():
     ch = next_char()
-    print(next_char())
+    if not ch.isdigit():
+        return False
     if ch=='0':
         return integer_Q2_state_1()
-    elif nonzerodigit(ch)==True:
+    elif nonzerodigit(ch):
         return integer_Q2_state_2()
     elif ch==END:
         return False
+    return False
 
 def integer_Q2_state_1():
     ch = next_char()
+    if not ch.isdigit():
+        return False
     if ch=='0':
         return integer_Q2_state_1()
     elif ch==END:
         return True
+    return True
 
 
 def integer_Q2_state_2():
     ch = next_char()
-    if nonzerodigit(ch)==True:
+    if not ch.isdigit():
+        return False
+    if nonzerodigit(ch):
         return integer_Q2_state_2()
     elif ch==END:
         return True
+    return True
 
 
 def pointfloat_Q2():
@@ -85,26 +93,26 @@ def pointfloat_Q2():
 
 def pointfloat_Q2_state_0():
     ch=next_char()
-    if digit(ch)==True:
+    if digit(ch):
         return pointfloat_Q2_state_2()
     elif ch=='.':
         return pointfloat_Q2_state_1()
 
 def pointfloat_Q2_state_1():
     ch=next_char()
-    if digit(ch)==True:
+    if digit(ch):
         return pointfloat_Q2_state_3()
     return False
 def pointfloat_Q2_state_2():
     ch=next_char()
-    if digit(ch)==True:
+    if digit(ch):
         return pointfloat_Q2_state_2()
     elif ch=='.':
         return pointfloat_Q2_state_3()
     return False
 def pointfloat_Q2_state_3():
     ch=next_char()
-    if digit(ch)==True:
+    if digit(ch):
         return pointfloat_Q2_state_3()
     return True 
     
