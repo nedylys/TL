@@ -59,33 +59,26 @@ def integer_Q2_state_0():
         return False
     if ch=='0':
         return integer_Q2_state_1()
-    elif nonzerodigit(ch):
+    if nonzerodigit(ch):
         return integer_Q2_state_2()
-    elif ch==END:
+    if ch==END:
         return False
-    return False
 
 def integer_Q2_state_1():
     ch = next_char()
-    if not ch.isdigit():
-        return False
     if ch=='0':
         return integer_Q2_state_1()
-    elif ch==END:
+    if ch==END:
         return True
-    return True
-
+    return False
 
 def integer_Q2_state_2():
     ch = next_char()
-    if not ch.isdigit():
-        return False
-    if nonzerodigit(ch):
+    if digit(ch):
         return integer_Q2_state_2()
-    elif ch==END:
+    if ch==END:
         return True
-    return True
-
+    return False
 
 def pointfloat_Q2():
     init_char()
@@ -95,26 +88,33 @@ def pointfloat_Q2_state_0():
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_2()
-    elif ch=='.':
+    if ch=='.':
         return pointfloat_Q2_state_1()
+    return False
 
 def pointfloat_Q2_state_1():
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_3()
+    elif ch==END:
+        return False
     return False
 def pointfloat_Q2_state_2():
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_2()
-    elif ch=='.':
+    if ch=='.':
         return pointfloat_Q2_state_3()
+    elif ch==END:
+        return False
     return False
 def pointfloat_Q2_state_3():
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_3()
-    return True 
+    elif ch==END:
+        return True
+    return False
     
 
 # Définir ici les fonctions manquantes
@@ -256,6 +256,7 @@ if __name__ == "__main__":
         ok = integer_Q2() # changer ici pour tester un autre automate sans valeur
         # ok, val = integer() # changer ici pour tester un autre automate avec valeur
         # ok, val = True, eval_exp() # changer ici pour tester eval_exp et eval_exp_v2
+        print(ok)
         if ok:
             print("Accepted!")
             # print("value:", val) # décommenter ici pour afficher la valeur (question 4 et +)
