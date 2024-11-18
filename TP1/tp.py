@@ -47,40 +47,48 @@ def digit(char):
 
 ############
 # Question 2 : integer et pointfloat sans valeur
-
+int_value=None
 def integer_Q2():
     init_char()
     return integer_Q2_state_0()
 
-
 def integer_Q2_state_0():
     ch = next_char()
+    if ch!=END and ch.isdigit():
+        int_value=int(ch)
+        print(int_value)
     if not ch.isdigit():
         return False
     if ch=='0':
-        return integer_Q2_state_1()
+        return integer_Q2_state_1(int_value)
     if nonzerodigit(ch):
-        return integer_Q2_state_2()
+        return integer_Q2_state_2(int_value)
     if ch==END:
         return False
 
-def integer_Q2_state_1():
+def integer_Q2_state_1(int_value):
     ch = next_char()
+    if ch!=END and ch.isdigit():
+        int_value=str(int_value)+ch
+        print(int(int_value))
     if ch=='0':
-        return integer_Q2_state_1()
+        return integer_Q2_state_1(int_value)
     if ch==END:
         return True
     return False
 
-def integer_Q2_state_2():
+def integer_Q2_state_2(int_value):
     ch = next_char()
+    if ch!=END and ch.isdigit():
+        int_value=str(int_value)+ch
+        print(int(int_value))
     if digit(ch):
-        return integer_Q2_state_2()
+        return integer_Q2_state_2(int_value)
     if ch==END:
         return True
     return False
 
-def pointfloat_Q2():
+def pointfloat_Q2(int_value):
     init_char()
     return pointfloat_Q2_state_0()
 
@@ -130,25 +138,38 @@ int_value = 0
 exp_value = 0
 
 def integer():
-    print("@ATTENTION: integer à finir !") # LIGNE A SUPPRIMER
+    init_char()
+    return integer_state_0(),
 
 
 def integer_state_0():
     global int_value
     ch = next_char()
-    print("@ATTENTION: integer_state_0 à finir !") # LIGNE A SUPPRIMER
+    if ch!=END and ch.isdigit():
+       int_value=int(ch)
+    if not ch.isdigit():
+        return False
+    if ch=='0':
+        return integer_state_1()
+    if nonzerodigit(ch):
+        return integer_state_2()
+    if ch==END:
+        return False
+    
 
 
 def integer_state_1():
     global int_value
     ch = next_char()
-    print("@ATTENTION: integer_state_1 à finir !") # LIGNE A SUPPRIMER
+    if ch!=END and ch.isdigit():
+       int_value=int(ch)
 
 
 def integer_state_2():
     global int_value
     ch = next_char()
-    print("@ATTENTION: integer_state_2 à finir !") # LIGNE A SUPPRIMER
+    if ch!=END and ch.isdigit():
+       int_value=int(ch)
 
 
 ############
@@ -256,7 +277,6 @@ if __name__ == "__main__":
         ok = integer_Q2() # changer ici pour tester un autre automate sans valeur
         # ok, val = integer() # changer ici pour tester un autre automate avec valeur
         # ok, val = True, eval_exp() # changer ici pour tester eval_exp et eval_exp_v2
-        print(ok)
         if ok:
             print("Accepted!")
             # print("value:", val) # décommenter ici pour afficher la valeur (question 4 et +)
