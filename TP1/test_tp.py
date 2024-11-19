@@ -16,9 +16,9 @@ stop_on_first_error = True
 
 # Quelles fonctions doivent être testées: True si on teste, False sinon
 
-test_integer_Q2    = True
-test_pointfloat_Q2 = True
-test_integer       = False
+test_integer_Q2    = False
+test_pointfloat_Q2 = False
+test_integer       = True
 test_pointfloat    = False
 test_exponent      = False
 test_exponentfloat = False

@@ -93,6 +93,7 @@ def pointfloat_Q2(int_value):
     return pointfloat_Q2_state_0()
 
 def pointfloat_Q2_state_0():
+    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_2()
@@ -101,6 +102,7 @@ def pointfloat_Q2_state_0():
     return False
 
 def pointfloat_Q2_state_1():
+    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_3()
@@ -108,6 +110,7 @@ def pointfloat_Q2_state_1():
         return False
     return False
 def pointfloat_Q2_state_2():
+    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_2()
@@ -117,6 +120,7 @@ def pointfloat_Q2_state_2():
         return False
     return False
 def pointfloat_Q2_state_3():
+    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_3()
@@ -136,10 +140,11 @@ def pointfloat_Q2_state_3():
 # Variables globales pour se transmettre les valeurs entre états
 int_value = 0
 exp_value = 0
+val_finale=int_value*10**(-exp_value)
 
 def integer():
     init_char()
-    return integer_state_0(),
+    return integer_state_0(),int_value
 
 
 def integer_state_0():
@@ -147,14 +152,17 @@ def integer_state_0():
     ch = next_char()
     if ch!=END and ch.isdigit():
        int_value=int(ch)
+       print(int_value)
     if not ch.isdigit():
+        int_value=None
         return False
     if ch=='0':
         return integer_state_1()
     if nonzerodigit(ch):
         return integer_state_2()
     if ch==END:
-        return False
+        int_value=None
+        return False 
     
 
 
@@ -162,14 +170,28 @@ def integer_state_1():
     global int_value
     ch = next_char()
     if ch!=END and ch.isdigit():
-       int_value=int(ch)
+       int_value=int(str(int_value)+ch)
+       print(int_value)
+    if ch=='0':
+        return integer_state_1()
+    if ch==END:
+        return True
+    int_value=None
+    return False
 
 
 def integer_state_2():
     global int_value
     ch = next_char()
     if ch!=END and ch.isdigit():
-       int_value=int(ch)
+       int_value=int(str(int_value)+ch)
+       print(int_value)
+    if digit(ch):
+        return integer_state_2()
+    if ch==END:
+        return True
+    int_value=None
+    return False
 
 
 ############
@@ -178,11 +200,67 @@ def integer_state_2():
 def pointfloat():
     global int_value
     global exp_value
+    global val_finale
     init_char()
-    int_value = 0.
-    exp_value = 0
-    return pointfloat_Q2_state_0()
+    return pointfloat_Q2_state_0(),int_value
+def pointfloat_state_0():
+    global int_value
+    global exp_value
+    global val_finale
+    ch=next_char()
+    if digit(ch):
+        int_value=int(ch)
+        print(int_value)
+        print(val_finale)
+        return pointfloat_state_2()
+    if ch=='.':
+        exp_value=0
+        return pointfloat_state_1()
+    val_finale=None
+    return False
 
+def pointfloat_state_1():
+    global int_value
+    global exp_value
+    global val_finale
+    ch=next_char()
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        return pointfloat_state_3()
+    val_finale=None
+    return False
+def pointfloat_state_2():
+    global int_value
+    global exp_value
+    global val_finale
+    ch=next_char()
+    cpt=0
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        print(int_value)
+        print(val_finale)
+        return pointfloat_state_2()
+    if ch=='.':
+        cpt+=1
+        exp_value=cpt
+        print(val_finale)
+        return pointfloat_state_3()
+    val_finale=None
+    return False
+def pointfloat_state_3():
+    global int_value
+    global exp_value
+    global val_finale
+    ch=next_char()
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        print(int_value)
+        print(val_finale)
+        return pointfloat_state_3()
+    elif ch==END:
+        return True
+    val_finale=None
+    return False
 
 # Définir ici les fonctions manquantes
 
@@ -274,14 +352,16 @@ if __name__ == "__main__":
     print("@ Vous pouvez changer l'automate testé en modifiant la fonction appelée à la ligne 'ok = ... '.")
     print("@ Tapez une entrée:")
     try:
-        ok = integer_Q2() # changer ici pour tester un autre automate sans valeur
+        ok,value = pointfloat() # changer ici pour tester un autre automate sans valeur
         # ok, val = integer() # changer ici pour tester un autre automate avec valeur
         # ok, val = True, eval_exp() # changer ici pour tester eval_exp et eval_exp_v2
         if ok:
             print("Accepted!")
+            print(value)
             # print("value:", val) # décommenter ici pour afficher la valeur (question 4 et +)
         else:
             print("Rejected!")
+            print(value)
             # print("value so far:", int_value) # décommenter ici pour afficher la valeur en cas de rejet
     except Error as e:
         print("Error:", e)
