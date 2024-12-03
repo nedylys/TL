@@ -270,6 +270,159 @@ def pointfloat_state_3():
 
 # La valeur du signe de l'exposant : 1 si +, -1 si -
 sign_value = 0
+exposant=0
+exponentfloat=0
+def exponent():
+    init_char()
+    return exponent_state_0()
+def exponent_state_0():
+    ch=next_char()
+    if ch=='e' or ch=='E':
+        return exponent_state_1()
+    return False
+def exponent_state_1():
+    global exposant
+    ch=next_char()
+    if ch=='+' or ch=='-':
+        return exponent_state_1()
+    elif digit(ch):
+        exposant=int(ch)
+        return exponent_state_2()
+    return False
+def exponent_state_2():
+    global exposant
+    ch=next_char()
+    if ch==END:
+        return True
+    if digit(ch):
+        exposant=int(str(exposant)+ch)
+        return exponent_state_2()
+    return False
+def exponent_float():
+    init_char()
+    return exponent_float_state_0()
+def exponent_float_state_0():
+    global exponentfloat
+    ch=next_char()
+    if pointfloat_Q2(ch) or digit(ch):
+        exponentfloat=float(ch)
+        return exponent_float_state_1()
+    return False
+def exponent_float_state_1():
+    global exponentfloat
+    ch=next_char()
+    if ch=='e' or ch=='E':
+        return exponent_float_state_2()
+    if digit(ch):
+        exponentfloat=float(str(exponentfloat)+ch)
+        return exponent_float_state_1()
+    return False
+def exponent_float_state_2():
+    global exposant
+    global sign_value
+    global expo
+    ch=next_char()
+    if ch=='+' :
+        sign_value=1
+        return exponent_float_state_2()
+    if ch=='-':
+        sign_value=-1
+        return exponent_float_state_2()
+    elif digit(ch):
+        exposant=int(ch)
+        return exponent_float_state_3()
+    return False
+def exponent_float_state_3():
+    global exposant
+    ch=next_char()
+    if ch==END:
+        if sign_value==1:
+            print(exponentfloat*10**exposant)
+        else:
+            print(exponentfloat*10**(-exposant))
+        return True
+    if digit(ch):
+        exposant=int(str(exposant)+ch)
+        return exponent_float_state_3()
+    return False
+def number():
+    init_char()
+    return number_state_0()
+def number_state_0():
+    ch=next_char()
+    if ch=='0':
+        return number_state_1()
+    if nonzerodigit(ch):
+        return number_state_2()
+    if ch=='.':
+        return number_state_3()
+    return False
+def number_state_1():
+    ch=next_char()
+    if ch=='0':
+        return number_state_1()
+    if ch==END:
+        return True
+    if digit(ch):
+        return number_state_5()
+    if ch=='E' or ch=='e':
+        return number_state_6()
+    if ch=='.':
+        return number_state_4()
+    return False
+def number_state_2():
+  ch=next_char()
+  if ch==END:
+    return True
+  if nonzerodigit(ch):
+    return number_state_2()
+  if ch=='E' or ch=='e':
+    return number_state_6()
+  if ch=='.':
+    return number_state_4()
+  return False
+def number_state_3():
+    ch=next_char()
+    if nonzerodigit(ch):
+        return number_state_4()
+    return False
+def number_state_4():
+    ch=next_char()
+    if ch==END:
+        return True
+    if nonzerodigit(ch):
+        return number_state_4()
+    if ch=='E' or ch=='e':
+        return number_state_6() 
+    return False
+def number_state_5():
+    ch=next_char()
+    if nonzerodigit(ch):
+        return number_state_5()
+    if ch=='E' or ch=='e':
+        return number_state_6()
+    if ch=='.':
+        return number_state_4()
+    return False
+def number_state_6():
+    ch=next_char()
+    if nonzerodigit(ch):
+        return number_state_8()
+    if ch=='+' or ch=='-':
+        return number_state_7()
+    return False
+def number_state_7():
+    ch=next_char()
+    if nonzerodigit(ch):
+        return number_state_8()
+    return False
+def number_state_8():
+    ch=next_char()
+    if nonzerodigit(ch):
+        return number_state_8()
+    if ch==END:
+        return True
+    return False
 
 
 
