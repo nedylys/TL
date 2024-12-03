@@ -27,6 +27,7 @@ def init_char():
 def next_char():
     global INPUT_STREAM
     ch = INPUT_STREAM.read(1)
+    print(f"Read char: {repr(ch)}")
     # print("@", repr(ch))  # decommenting this line may help debugging
     if ch in V or ch == END:
         return ch
@@ -141,6 +142,7 @@ def pointfloat_Q2_state_3():
 int_value = 0
 exp_value = 0
 val_finale=int_value*10**(-exp_value)
+
 
 def integer():
     init_char()
@@ -323,20 +325,20 @@ def exponent_float_state_0():
     if pointfloat_Q2(ch) or digit(ch):
         exponentfloat=float(ch)
         return exponent_float_state_1()
-    return False
+    return False,None
 def exponent_float_state_1():
     global exponentfloat
     ch=next_char()
-    if ch=='e' or ch=='E':
+    print(ch)
+    if ch== 'e' or ch== 'E':
         return exponent_float_state_2()
     if digit(ch):
         exponentfloat=float(str(exponentfloat)+ch)
         return exponent_float_state_1()
-    return False
+    return False,None
 def exponent_float_state_2():
     global exposant
     global sign_value
-    global expo
     ch=next_char()
     if ch=='+' :
         sign_value=1
@@ -347,98 +349,134 @@ def exponent_float_state_2():
     elif digit(ch):
         exposant=int(ch)
         return exponent_float_state_3()
-    return False
+    return False,None
 def exponent_float_state_3():
     global exposant
     ch=next_char()
     if ch==END:
-        if sign_value==1:
-            print(exponentfloat*10**exposant)
-        else:
-            print(exponentfloat*10**(-exposant))
-        return True
+        return True,exponentfloat*10**(sign_value*exposant)
     if digit(ch):
         exposant=int(str(exposant)+ch)
         return exponent_float_state_3()
-    return False
+    return False,None
 def number():
+    global int_value
+    global exp_value
+    global exposant
+    int_value=0
+    exp_value=0
+    exposant=0
     init_char()
     return number_state_0()
 def number_state_0():
+    global int_value
+    global exp_value
     ch=next_char()
     if ch=='0':
+        int_value=int(ch)
         return number_state_1()
     if nonzerodigit(ch):
+        int_value=int(ch)
         return number_state_2()
     if ch=='.':
         return number_state_3()
-    return False
+    return False,None
 def number_state_1():
+    global int_value
+    global exp_value
     ch=next_char()
     if ch=='0':
+        int_value=int(str(int_value)+ch)
         return number_state_1()
     if ch==END or ch=='_':
-        return True
+        return True,int_value
     if digit(ch):
+        int_value=int(str(int_value)+ch)
         return number_state_5()
     if ch=='E' or ch=='e':
         return number_state_6()
     if ch=='.':
         return number_state_4()
-    return False
+    return False,None
 def number_state_2():
+  global int_value
+  global exp_value
   ch=next_char()
   if ch==END or ch=='_':
-    return True
-  if nonzerodigit(ch):
+    return True,int_value
+  if digit(ch):
+    int_value=int(str(int_value)+ch)
     return number_state_2()
   if ch=='E' or ch=='e':
     return number_state_6()
   if ch=='.':
     return number_state_4()
-  return False
+  return False,None
 def number_state_3():
+    global int_value
+    global exp_value
     ch=next_char()
-    if nonzerodigit(ch):
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        exp_value+=1
         return number_state_4()
-    return False
+    return False,None
 def number_state_4():
+    global int_value
+    global exp_value
     ch=next_char()
     if ch==END or ch=='_':
-        return True
-    if nonzerodigit(ch):
+        return True,int_value*10**(-exp_value)
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        exp_value+=1
         return number_state_4()
     if ch=='E' or ch=='e':
         return number_state_6() 
-    return False
+    return False,None
 def number_state_5():
+    global int_value
+    global exp_value
     ch=next_char()
     if nonzerodigit(ch):
+        int_value=int(str(int_value)+ch)
         return number_state_5()
     if ch=='E' or ch=='e':
         return number_state_6()
     if ch=='.':
         return number_state_4()
-    return False
+    return False,None
 def number_state_6():
+    global exponent
+    global sign_value
     ch=next_char()
-    if nonzerodigit(ch):
+    if digit(ch):
+        sign_value=1
+        exponent=int(ch)
         return number_state_8()
-    if ch=='+' or ch=='-':
+    if ch=='+':
+        sign_value=1
         return number_state_7()
-    return False
+    if ch=='-':
+        sign_value=-1
+        return number_state_7()
+    return False,None
 def number_state_7():
+    global exponent
     ch=next_char()
-    if nonzerodigit(ch):
+    if digit(ch):
+        exponent=int(ch)
         return number_state_8()
-    return False
+    return False,None
 def number_state_8():
+    global exponent
     ch=next_char()
-    if nonzerodigit(ch):
+    if digit(ch):
+        exponent=int(str(exponent)+ch)
         return number_state_8()
     if ch==END or ch=='_':
-        return True
-    return False
+        return True,int_value*10**(sign_value*exponent-exp_value)
+    return False,None
 
 
 
@@ -456,7 +494,9 @@ V = set(('.', 'e', 'E', '+', '-', '*', '/', '(', ')', ' ')
 
 def eval_exp():
     ch = next_char()
-    if ch=='':
+    if ch=='_':
+        eval_exp()
+    if ch=='*':
         n1=eval_exp()
         n2=eval_exp()
         return n1*n2     
@@ -472,9 +512,9 @@ def eval_exp():
        n1=eval_exp()
        n2=eval_exp()
        return n1/n2
-    print(ch)
-    return number()
-eval_exp()
+    _,nbr=number()
+    return nbr
+print(eval_exp())
 
 ############
 # Question 12 : eval_exp corrigé
@@ -527,14 +567,14 @@ def FA_Lex_w_token():
     print("@ATTENTION: FA_lex_w_token à finir !") # LIGNE A SUPPRIMER
 
 
-
+a=1
 # Fonction de test
-if __name__ == "__main__":
+if __name__ == "__main__" and a==0:
     print("@ Test interactif de l'automate")
     print("@ Vous pouvez changer l'automate testé en modifiant la fonction appelée à la ligne 'ok = ... '.")
     print("@ Tapez une entrée:")
     try:
-        ok,value = pointfloat() # changer ici pour tester un autre automate sans valeur
+        ok,value = number() # changer ici pour tester un autre automate sans valeur
         # ok, val = integer() # changer ici pour tester un autre automate avec valeur
         # ok, val = True, eval_exp() # changer ici pour tester eval_exp et eval_exp_v2
         if ok:
