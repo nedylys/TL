@@ -269,35 +269,51 @@ def pointfloat_state_3():
 # Question 8 : exponent, exponentfloat et number
 
 # La valeur du signe de l'exposant : 1 si +, -1 si -
-sign_value = 0
+sign_value =0
 exposant=0
 exponentfloat=0
 def exponent():
+    global exposant
+    global sign_value
+    sign_value =0
+    exposant=0
     init_char()
     return exponent_state_0()
 def exponent_state_0():
     ch=next_char()
     if ch=='e' or ch=='E':
         return exponent_state_1()
-    return False
+    return False,None
 def exponent_state_1():
     global exposant
+    global sign_value
     ch=next_char()
-    if ch=='+' or ch=='-':
+    if ch=='+':
+        if sign_value!=0:
+            return False,None
+        sign_value=1
+        return exponent_state_1()
+    if ch=='-':
+        if sign_value!=0:
+          return False,None
+        sign_value=-1
         return exponent_state_1()
     elif digit(ch):
+        if sign_value==0:
+            sign_value=1
         exposant=int(ch)
         return exponent_state_2()
-    return False
+    return False,None
 def exponent_state_2():
     global exposant
+    global sign_value
     ch=next_char()
     if ch==END:
-        return True
+        return True,sign_value*exposant
     if digit(ch):
         exposant=int(str(exposant)+ch)
         return exponent_state_2()
-    return False
+    return False,None
 def exponent_float():
     init_char()
     return exponent_float_state_0()
@@ -361,7 +377,7 @@ def number_state_1():
     ch=next_char()
     if ch=='0':
         return number_state_1()
-    if ch==END:
+    if ch==END or ch=='_':
         return True
     if digit(ch):
         return number_state_5()
@@ -372,7 +388,7 @@ def number_state_1():
     return False
 def number_state_2():
   ch=next_char()
-  if ch==END:
+  if ch==END or ch=='_':
     return True
   if nonzerodigit(ch):
     return number_state_2()
@@ -388,7 +404,7 @@ def number_state_3():
     return False
 def number_state_4():
     ch=next_char()
-    if ch==END:
+    if ch==END or ch=='_':
         return True
     if nonzerodigit(ch):
         return number_state_4()
@@ -420,7 +436,7 @@ def number_state_8():
     ch=next_char()
     if nonzerodigit(ch):
         return number_state_8()
-    if ch==END:
+    if ch==END or ch=='_':
         return True
     return False
 
@@ -439,13 +455,26 @@ V = set(('.', 'e', 'E', '+', '-', '*', '/', '(', ')', ' ')
 # Question 10 : eval_exp
 
 def eval_exp():
-    print("@ATTENTION: eval_exp à finir !") # LIGNE A SUPPRIMER
     ch = next_char()
+    if ch=='':
+        n1=eval_exp()
+        n2=eval_exp()
+        return n1*n2     
     if ch == '+':
         n1 = eval_exp()
         n2 = eval_exp()
         return n1 + n2
-
+    if ch=='-':
+        n1 = eval_exp()
+        n2 = eval_exp()
+        return n1 -n2
+    if ch=='/':
+       n1=eval_exp()
+       n2=eval_exp()
+       return n1/n2
+    print(ch)
+    return number()
+eval_exp()
 
 ############
 # Question 12 : eval_exp corrigé

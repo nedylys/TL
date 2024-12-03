@@ -19,8 +19,8 @@ stop_on_first_error = True
 test_integer_Q2    = False
 test_pointfloat_Q2 = False
 test_integer       = False
-test_pointfloat    = True
-test_exponent      = False
+test_pointfloat    = False
+test_exponent      = True
 test_exponentfloat = False
 test_number        = False
 
