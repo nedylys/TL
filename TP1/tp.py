@@ -371,7 +371,7 @@ def number():
 def number_state_0():
     global int_value
     global exp_value
-    ch=next_char()
+    ch=peek_char()
     if ch=='0':
         int_value=int(ch)
         return number_state_1()
@@ -388,7 +388,7 @@ def number_state_1():
     if ch=='0':
         int_value=int(str(int_value)+ch)
         return number_state_1()
-    if ch==END or ch=='_':
+    if ch==END or ch==' ':
         return True,int_value
     if digit(ch):
         int_value=int(str(int_value)+ch)
@@ -402,7 +402,7 @@ def number_state_2():
   global int_value
   global exp_value
   ch=next_char()
-  if ch==END or ch=='_':
+  if ch==END or ch==' ':
     return True,int_value
   if digit(ch):
     int_value=int(str(int_value)+ch)
@@ -425,7 +425,7 @@ def number_state_4():
     global int_value
     global exp_value
     ch=next_char()
-    if ch==END or ch=='_':
+    if ch==END or ch==' ':
         return True,int_value*10**(-exp_value)
     if digit(ch):
         int_value=int(str(int_value)+ch)
@@ -494,8 +494,6 @@ V = set(('.', 'e', 'E', '+', '-', '*', '/', '(', ')', ' ')
 
 def eval_exp():
     ch = next_char()
-    if ch=='_':
-        eval_exp()
     if ch=='*':
         n1=eval_exp()
         n2=eval_exp()
@@ -503,6 +501,8 @@ def eval_exp():
     if ch == '+':
         n1 = eval_exp()
         n2 = eval_exp()
+        print(n1)
+        print(n2)
         return n1 + n2
     if ch=='-':
         n1 = eval_exp()
@@ -514,7 +514,7 @@ def eval_exp():
        return n1/n2
     _,nbr=number()
     return nbr
-print(eval_exp())
+
 
 ############
 # Question 12 : eval_exp corrigé
@@ -536,14 +536,151 @@ def consume_char():
     global current_char
     current_char = ''
 
-
-def number_v2():
-    print("@ATTENTION: number_v2 à finir !") # LIGNE A SUPPRIMER
-
+def number_2():
+    global int_value
+    global exp_value
+    global exposant
+    int_value=0
+    exp_value=0
+    exposant=0
+    init_char()
+    return number_2_state_0()
+def number_2_state_0():
+    global int_value
+    global exp_value
+    ch=next_char()
+    print(ch+'etat0')
+    if ch=='0':
+        int_value=int(ch)
+        return number_2_state_1()
+    if nonzerodigit(ch):
+        int_value=int(ch)
+        return number_2_state_2()
+    if ch=='.':
+        return number_2_state_3()
+    return False,None
+def number_2_state_1():
+    global int_value
+    global exp_value
+    ch=next_char()
+    if ch=='0':
+        int_value=int(str(int_value)+ch)
+        return number_2_state_1()
+    if ch==END or ch==' ':
+        return True,int_value
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        return number_2_state_5()
+    if ch=='E' or ch=='e':
+        return number_2_state_6()
+    if ch=='.':
+        return number_2_state_4()
+    return False,None
+def number_2_state_2():
+  global int_value
+  global exp_value
+  ch=next_char()
+  if ch==END or ch==' ':
+    return True,int_value
+  if digit(ch):
+    int_value=int(str(int_value)+ch)
+    return number_2_state_2()
+  if ch=='E' or ch=='e':
+    return number_2_state_6()
+  if ch=='.':
+    return number_2_state_4()
+  return False,None
+def number_2_state_3():
+    global int_value
+    global exp_value
+    ch=next_char()
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        exp_value+=1
+        return number_2_state_4()
+    return False,None
+def number_2_state_4():
+    global int_value
+    global exp_value
+    ch=next_char()
+    if ch==END or ch==' ':
+        return True,int_value*10**(-exp_value)
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        exp_value+=1
+        return number_2_state_4()
+    if ch=='E' or ch=='e':
+        return number_2_state_6() 
+    return False,None
+def number_2_state_5():
+    global int_value
+    global exp_value
+    ch=next_char()
+    if nonzerodigit(ch):
+        int_value=int(str(int_value)+ch)
+        return number_2_state_5()
+    if ch=='E' or ch=='e':
+        return number_state_6()
+    if ch=='.':
+        return number_2_state_4()
+    return False,None
+def number_2_state_6():
+    global exponent
+    global sign_value
+    ch=next_char()
+    if digit(ch):
+        sign_value=1
+        exponent=int(ch)
+        return number_2_state_8()
+    if ch=='+':
+        sign_value=1
+        return number_2_state_7()
+    if ch=='-':
+        sign_value=-1
+        return number_2_state_7()
+    return False,None
+def number_2_state_7():
+    global exponent
+    ch=next_char()
+    if digit(ch):
+        exponent=int(ch)
+        return number_2_state_8()
+    return False,None
+def number_2_state_8():
+    global exponent
+    ch=next_char()
+    if digit(ch):
+        exponent=int(str(exponent)+ch)
+        return number_2_state_8()
+    if ch==END or ch==' ':
+        return True,int_value*10**(sign_value*exponent-exp_value)
+    return False,None
 
 def eval_exp_v2():
-    print("@ATTENTION: eval_exp_v2 à finir !") # LIGNE A SUPPRIMER
-
+    ch = peek_char()
+    if ch=='*':
+        consume_char()
+        n1=eval_exp_v2()
+        n2=eval_exp_v2()
+        return n1*n2     
+    if ch == '+':
+        consume_char()
+        n1 = eval_exp_v2()
+        n2 = eval_exp_v2()
+        return n1 + n2
+    if ch=='-':
+        consume_char()
+        n1 = eval_exp_v2()
+        n2 = eval_exp_v2()
+        return n1 -n2
+    if ch=='/':
+       consume_char()
+       n1=eval_exp_v2()
+       n2=eval_exp_v2()
+       return n1/n2
+    _,nbr=number_2()
+    return nbr
+print(eval_exp_v2())
 
 ############
 # Question 14 : automate pour Lex
@@ -551,7 +688,15 @@ def eval_exp_v2():
 operator = set(['+', '-', '*', '/'])
 
 def FA_Lex():
-    print("@ATTENTION: FA_lex à finir !") # LIGNE A SUPPRIMER
+    init_char()
+    return FA_Lex_state_0()
+def FA_Lex_state_0():
+    ch=peek_char()
+    if ch in operator or ch==')' or ch=='(':
+        return True,1
+    appartient_number,_=number()
+    return appartient_number,1
+    
 
 
 ############
@@ -567,14 +712,14 @@ def FA_Lex_w_token():
     print("@ATTENTION: FA_lex_w_token à finir !") # LIGNE A SUPPRIMER
 
 
-a=1
+a=0
 # Fonction de test
 if __name__ == "__main__" and a==0:
     print("@ Test interactif de l'automate")
     print("@ Vous pouvez changer l'automate testé en modifiant la fonction appelée à la ligne 'ok = ... '.")
     print("@ Tapez une entrée:")
     try:
-        ok,value = number() # changer ici pour tester un autre automate sans valeur
+        ok,value = FA_Lex() # changer ici pour tester un autre automate sans valeur
         # ok, val = integer() # changer ici pour tester un autre automate avec valeur
         # ok, val = True, eval_exp() # changer ici pour tester eval_exp et eval_exp_v2
         if ok:
