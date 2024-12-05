@@ -21,8 +21,8 @@ test_pointfloat_Q2 = False
 test_integer       = False
 test_pointfloat    = False
 test_exponent      = False
-test_exponentfloat = False
-test_number        = True
+test_exponentfloat = True
+test_number        = False
 
 # Le caractère de fin est \0, et non \n
 tp.END = ''
