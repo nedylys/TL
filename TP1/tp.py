@@ -37,12 +37,12 @@ def next_char():
 # Question 1 : fonctions nonzerodigit et digit
 
 def nonzerodigit(char):
-    assert (len(char) <= 1)
+    assert len(char) <= 1
     # RMQ: on n'utilise pas 1 <= int(char) <= 9 car cela échoue sur la chaîne vide
     return '1' <= char <= '9'
 
 def digit(char):
-    assert (len(char) <= 1)
+    assert len(char) <= 1
     return '0' <= char <= '9'
 
 
@@ -50,6 +50,9 @@ def digit(char):
 # Question 2 : integer et pointfloat sans valeur
 int_value=None
 def integer_Q2():
+    """
+    L'automate de integer_Q2
+    """
     init_char()
     return integer_Q2_state_0()
 
@@ -88,12 +91,11 @@ def integer_Q2_state_2(int_value):
         return True
     return False
 
-def pointfloat_Q2(int_value):
+def pointfloat_Q2():
     init_char()
     return pointfloat_Q2_state_0()
 
 def pointfloat_Q2_state_0():
-    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_2()
@@ -102,7 +104,6 @@ def pointfloat_Q2_state_0():
     return False
 
 def pointfloat_Q2_state_1():
-    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_3()
@@ -110,7 +111,6 @@ def pointfloat_Q2_state_1():
         return False
     return False
 def pointfloat_Q2_state_2():
-    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_2()
@@ -120,7 +120,6 @@ def pointfloat_Q2_state_2():
         return False
     return False
 def pointfloat_Q2_state_3():
-    
     ch=next_char()
     if digit(ch):
         return pointfloat_Q2_state_3()
@@ -163,9 +162,7 @@ def integer_state_0():
     if ch==END:
         int_value=None
         return False 
-    
-
-
+  
 def integer_state_1():
     global int_value
     ch = next_char()
@@ -177,7 +174,6 @@ def integer_state_1():
         return True
     int_value=None
     return False
-
 
 def integer_state_2():
     global int_value
@@ -309,67 +305,103 @@ def exponent_state_2():
         return exponent_state_2()
     return False,None
 def exponentfloat():
-    global int_value
+    global exp
     global sign_value
-    global exp_value
-    global pres_e
-    int_value=0
-    sign_value=0
-    exp_value=0
-    pres_e=0
+    global expf
     init_char()
+    exp=0
+    expf=0
     return exponentfloat_state_0()
+
 def exponentfloat_state_0():
-    global int_value
-    ok1,_=pointfloat()
-    print(ok1)
-    if pres_e==2:
-        return exponentfloat_state_2()
-    if str(int_value)!='@':
-        if pres_e==1:
-            return exponentfloat_state_2()
-        return exponentfloat_state_1()
-    return False,None
-def exponentfloat_state_1():
-    global int_value
-    ch=next_char()
-    print(ch)
-    if ch== 'e' or ch== 'E':
-        return exponentfloat_state_2()
-    if digit(ch):
-        int_value=int(str(int_value)+ch)
-        return exponentfloat_state_1()
-    return False,None
-def exponentfloat_state_2():
-    global exposant
+    global exp
     global sign_value
+    global expf
     ch=next_char()
-    if ch=='+' :
-        if sign_value!=0:
-            return False,None
-        sign_value=1
-        return exponentfloat_state_2()
-    if ch=='-':
-        if sign_value!=0:
-            return False,None
-        sign_value=-1
-        return exponentfloat_state_2()
+    if ch =='.':
+        return exponentfloat_state_1()
     if digit(ch):
-        if sign_value==0:
-            sign_value=1
-        exposant=int(ch)
+        expf=int(ch)
+        return exponentfloat_state_2()
+    return (False,None)
+
+def exponentfloat_state_1():
+    global exp
+    global sign_value
+    global expf
+    ch=next_char()
+    if digit(ch):
+        expf=float('.'+ch)
         return exponentfloat_state_3()
-    return False,None
+    return (False,None)
+
+def exponentfloat_state_2():
+    global exp
+    global sign_value
+    global expf
+    ch=next_char()
+    if digit(ch):
+        expf = int(str(expf)+ch)
+        return exponentfloat_state_2()
+    if ch == '.':
+        return exponentfloat_state_3()
+    if ch in 'eE':
+        return exponentfloat_state_4()
+    return (False,None)
+
 def exponentfloat_state_3():
-    global exposant
+    global exp
+    global sign_value
+    global expf
     ch=next_char()
-    if ch==END:
-        print(sign_value)
-        return True,int_value*10**(sign_value*exposant-exp_value)
+    s=0
     if digit(ch):
-        exposant=int(str(exposant)+ch)
+        if '.' not in str(expf):
+            expf=float(str(expf)+'.'+ch)
+            return exponentfloat_state_3()
+        expf=float(str(expf)+ch)
         return exponentfloat_state_3()
-    return False,None
+    if ch in 'eE':
+        return exponentfloat_state_4()
+    return (False,None)
+
+def exponentfloat_state_4():
+    global exp
+    global sign_value
+    global expf
+    ch=next_char()
+    if ch == '+':
+        sign_value=+1
+        return exponentfloat_state_5()
+    if ch == '-':
+        sign_value=-1
+        return exponentfloat_state_5()
+    if digit(ch):
+        exp=int(ch)
+        return exponentfloat_state_6()
+    return (False,None)
+
+def exponentfloat_state_5():
+    global exp
+    global sign_value
+    global expf
+    ch=next_char()
+    if digit(ch):
+        exp=sign_value*int(str(exp)+ch)
+        return exponentfloat_state_6()
+    return (False,None)
+
+def exponentfloat_state_6():
+    global exp
+    global expf
+    ch=next_char()
+    if digit(ch):
+        exp=int(str(exp)+ch)
+        return exponentfloat_state_6()
+    if ch==END:
+        expf=expf*(10**exp)
+        return (True,expf)
+    return (False,None)
 def number():
     global int_value
     global exp_value
@@ -559,15 +591,18 @@ def number_2():
 def number_2_state_0():
     global int_value
     global exp_value
-    ch=next_char()
+    ch=peek_char()
     print(ch+'etat0')
     if ch=='0':
+        consume_char()
         int_value=int(ch)
         return number_2_state_1()
     if nonzerodigit(ch):
+        consume_char()
         int_value=int(ch)
         return number_2_state_2()
     if ch=='.':
+        consume_char()
         return number_2_state_3()
     return False,None
 def number_2_state_1():
@@ -669,6 +704,10 @@ def number_2_state_8():
 
 def eval_exp_v2():
     ch = peek_char()
+    print(ch)
+    if ch==' ':
+        consume_char()
+        return eval_exp_v2()
     if ch=='*':
         consume_char()
         n1=eval_exp_v2()
@@ -683,11 +722,13 @@ def eval_exp_v2():
         consume_char()
         n1 = eval_exp_v2()
         n2 = eval_exp_v2()
-        return n1 -n2
+        return n1-n2
     if ch=='/':
        consume_char()
        n1=eval_exp_v2()
        n2=eval_exp_v2()
+       if n2==0:
+           return None
        return n1/n2
     _,nbr=number_2()
     return nbr
@@ -704,9 +745,9 @@ def FA_Lex():
 def FA_Lex_state_0():
     ch=peek_char()
     if ch in operator or ch==')' or ch=='(':
-        return True,1
+        return True
     appartient_number,_=number()
-    return appartient_number,1
+    return appartient_number
     
 
 
@@ -746,16 +787,16 @@ if __name__ == "__main__" and a==0:
     print("@ Vous pouvez changer l'automate testé en modifiant la fonction appelée à la ligne 'ok = ... '.")
     print("@ Tapez une entrée:")
     try:
-        ok,value = pointfloat() # changer ici pour tester un autre automate sans valeur
+        #ok = eval_exp_v2() # changer ici pour tester un autre automate sans valeur
         # ok, val = integer() # changer ici pour tester un autre automate avec valeur
-        # ok, val = True, eval_exp() # changer ici pour tester eval_exp et eval_exp_v2
+        ok, val = True, eval_exp_v2() # changer ici pour tester eval_exp et eval_exp_v2
         if ok:
             print("Accepted!")
-            print(value)
+            print(val)
             # print("value:", val) # décommenter ici pour afficher la valeur (question 4 et +)
         else:
             print("Rejected!")
-            print(value)
+            #print(value)
             # print("value so far:", int_value) # décommenter ici pour afficher la valeur en cas de rejet
     except Error as e:
         print("Error:", e)

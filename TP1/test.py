@@ -101,3 +101,65 @@ if __name__ == "__main__":
             # print("value so far:", int_value) # décommenter ici pour afficher la valeur en cas de rejet
     except Error as e:
         print("Error:", e)
+def exponentfloat():
+    global int_value
+    global sign_value
+    global exp_value
+    global pres_e
+    int_value=0
+    sign_value=0
+    exp_value=0
+    pres_e=0
+    init_char()
+    return exponentfloat_state_0()
+def exponentfloat_state_0():
+    global int_value
+    ok1,_=pointfloat()
+    print(ok1)
+    if pres_e==2:
+        return exponentfloat_state_2()
+    if str(int_value)!='@':
+        if pres_e==1:
+            return exponentfloat_state_2()
+        return exponentfloat_state_1()
+    return False,None
+def exponentfloat_state_1():
+    global int_value
+    ch=next_char()
+    print(ch)
+    if ch== 'e' or ch== 'E':
+        return exponentfloat_state_2()
+    if digit(ch):
+        int_value=int(str(int_value)+ch)
+        return exponentfloat_state_1()
+    return False,None
+def exponentfloat_state_2():
+    global exposant
+    global sign_value
+    ch=next_char()
+    if ch=='+' :
+        if sign_value!=0:
+            return False,None
+        sign_value=1
+        return exponentfloat_state_2()
+    if ch=='-':
+        if sign_value!=0:
+            return False,None
+        sign_value=-1
+        return exponentfloat_state_2()
+    if digit(ch):
+        if sign_value==0:
+            sign_value=1
+        exposant=int(ch)
+        return exponentfloat_state_3()
+    return False,None
+def exponentfloat_state_3():
+    global exposant
+    ch=next_char()
+    if ch==END:
+        print(sign_value)
+        return True,int_value*10**(sign_value*exposant-exp_value)
+    if digit(ch):
+        exposant=int(str(exposant)+ch)
+        return exponentfloat_state_3()
+    return False,None
